@@ -3,67 +3,80 @@ const image = document.querySelector('#beer-image')
 const description = document.querySelector('#beer-description');
 
 const reviewList = document.querySelector('#review-list');
-let firstLi = document.querySelector('#review-list li');
-firstLi.remove()
-let remLi = document.querySelector('#review-list li');
-remLi.remove();
 
+fetch('http://localhost:3000/beers/1')
+    .then(res => res.json())
+    .then(data => renderBeer(data))
 
 
 //render first beer on main page
-function renderFirstBeer(){
-    fetch('http://localhost:3000/beers/1')
-    .then(res => res.json())
-    .then(data => {
-        beerName.innerText = data.name;
+function renderBeer(data){
+    beerName.innerText = data.name;
         image.src = data.image_url;
         image.alt = data.name;
         description.innerText = data.description;
-        reviewList.innerHTML = `
-        <li>${data.reviews[0]}</li>
-        <li>${data.reviews[1]}</li>
-        <li>${data.reviews[2]}</li>
-        <li>${data.reviews[3]}</li>
-        `
-        
-    })
+        reviewList.replaceChildren();
+        reviewData = data.reviews
+        data.reviews.forEach(review => {
+            let reviewItem = document.createElement('li')
+            reviewItem.textContent = review
+            reviewList.appendChild(reviewItem)
+        })
+        customerReviewForm();
+
 }
-renderFirstBeer();
+
 //see beers in nav bar
 const beerList = document.querySelector("#beer-list");
-let liOne = document.querySelector('#beer-list li');
-liOne.remove();
-let liTwo = document.querySelector('#beer-list li');
-liTwo.remove();
-let liThree = document.querySelector('#beer-list li');
-liThree.remove();
+beerList.replaceChildren();
 
 
-function getAllBeers(){
+
+function listAllBeers(){
     fetch('http://localhost:3000/beers')
     .then(res => res.json())
-    .then(beerData => {
-        beerData.forEach(beer => {
+    .then(data => {
+        data.forEach(beer => {
             let menuItem = document.createElement('li')
             menuItem.innerText = beer.name
             beerList.appendChild(menuItem)
+            menuItem.addEventListener('click',(e) => {
+                e.preventDefault;
+                renderBeer(beer)
+            })
+            
         })
     })    
 }
+
+
+
 function customerReviewForm(){
     document.querySelector("#review-form").addEventListener('submit',(e) => {
         e.preventDefault()
         handleSubmit(e.target.review.value)
     })
-} 
+}
 function handleSubmit(review){
     let newReview = document.createElement('li')
     newReview.textContent = review
     document.querySelector('#review-list').appendChild(newReview)
 }
-
-function navBarList(){
-    getAllBeers()
+function deleteReview(){
+    reviewList.addEventListener('click',(e) => {
+            e.preventDefault;
+            let li = e.target;
+            li.parentElement.removeChild(li)
+    })
 }
-navBarList();
-customerReviewForm();
+function changeDescription(description){
+    document.querySelector('#description-form').addEventListener('submit',(e) => {
+        e.preventDefault;
+        console.log('click')
+    })
+}
+
+listAllBeers();
+//customerReviewForm();
+deleteReview();
+
