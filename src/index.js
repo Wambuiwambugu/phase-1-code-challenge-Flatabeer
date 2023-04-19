@@ -1,19 +1,17 @@
+baseUrl = 'http://localhost:3000/beers'
 const beerName = document.querySelector('#beer-name');
 const image = document.querySelector('#beer-image')
 const domDescription = document.querySelector('#beer-description');
 
 const reviewList = document.querySelector('#review-list');
 const descriptionForm = document.querySelector('#description-form');
-console.log(descriptionForm);
 
-id = 1;
-const idPath = 'beer:${id}'
-
-fetch('http://localhost:3000/beers/1')
+function getOneBeer(id = 1){
+fetch(`http://localhost:3000/beers/${id}`)
     .then(res => res.json())
     .then(data => renderBeer(data))
-
-
+}
+getOneBeer()
 //render first beer on main page
 function renderBeer(data){
     beerName.innerText = data.name;
@@ -28,7 +26,7 @@ function renderBeer(data){
             reviewList.appendChild(reviewItem)
         })
         customerReviewForm();
-
+        changeDescription();
 }
 
 //see beers in nav bar
@@ -76,27 +74,27 @@ function deleteReview(){
 }
 
 //ge
-function changeDescription(){
+function changeDescription(){    
     descriptionForm.addEventListener('submit',(e) => {
         e.preventDefault();
-        let newDescription = e.target.description.value
+        let newDescription = e.target.description.value;
         replaceDescription(newDescription)
         e.target.description.value = ''
-    })
+   })
 }
-changeDescription();
 
 function replaceDescription(newDescription){
- fetch('http://localhost:3000/beers')
- .then(res => res.json())
- .then(data => {
-    data.forEach(beer => {
-        domDescription.textContent = newDescription
+    fetch(`http://localhost:3000/beers/${id}`,{
+        method:'PATCH',
+        headers:{
+            'Content-type':'application/json'
+        },
+        body: JSON.stringify({
+            description: newDescription
+        })
     })
- })
-
-
- 
+    .then(res => res.json)
+    .then(data => console.log(data))
 }
 
 listAllBeers();
